@@ -2,6 +2,7 @@
 import subprocess
 import re
 import os
+import sys
 from argparse import ArgumentParser
 
 
@@ -300,20 +301,31 @@ end
 def main():
     parser = ArgumentParser()
     parser.add_argument(
-        'binary',
-        choices=('docker', 'docker-compose')
-    )
-    parser.add_argument(
         '--docker-path',
         default='/usr/bin'
     )
 
     args = parser.parse_args()
 
-    if args.binary == 'docker':
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    docker_fish = os.path.join(script_dir, 'docker.fish')
+    print(f'Generating {docker_fish}...')
+    with open(docker_fish, 'w') as f:
+        old_stdout = sys.stdout
+        sys.stdout = f
         DockerFishGenerator(DockerCmdLine(args.docker_path)).generate()
-    else:
+        sys.stdout = old_stdout
+
+    compose_fish = os.path.join(script_dir, 'docker-compose.fish')
+    print(f'Generating {compose_fish}...')
+    with open(compose_fish, 'w') as f:
+        old_stdout = sys.stdout
+        sys.stdout = f
         DockerComposeFishGenerator(DockerComposeCmdLine(args.docker_path)).generate()
+        sys.stdout = old_stdout
+
+    print('Done.')
 
 if __name__ == '__main__':
     main()
