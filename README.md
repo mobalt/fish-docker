@@ -11,9 +11,11 @@ Installation
 
 ### Manual
 
-    mkdir -p ~/.config/fish/completions
+    mkdir -p ~/.config/fish/completions ~/.config/fish/functions
     wget https://raw.githubusercontent.com/mobalt/fish-docker/master/completions/docker.fish -O ~/.config/fish/completions/docker.fish
     wget https://raw.githubusercontent.com/mobalt/fish-docker/master/completions/docker-compose.fish -O ~/.config/fish/completions/docker-compose.fish
+    wget https://raw.githubusercontent.com/mobalt/fish-docker/master/completions/docker-util.fish -O ~/.config/fish/completions/docker-util.fish
+    wget https://raw.githubusercontent.com/mobalt/fish-docker/master/functions/docker-util.fish -O ~/.config/fish/functions/docker-util.fish
 
 fish will show up the new completions straight away, no reload necessary.
     
@@ -29,6 +31,28 @@ Example
 
     % docker run -t -i busybox:latest
     / #
+
+docker-util
+-----------
+The `docker-util` command provides additional Docker utilities.
+
+### nsenter
+Enter a container's namespace using nsenter. Useful for debugging containers with networking tools not installed in the container.
+
+    docker-util nsenter [nsenter-args] -- <container>
+
+Examples:
+
+    # Enter all namespaces of a container
+    docker-util nsenter --all -- my-container
+
+    # Enter only the network namespace
+    docker-util nsenter --net -- my-container
+
+    # Enter multiple specific namespaces
+    docker-util nsenter --mount --uts --ipc --net --pid -- my-container
+
+Tab completion is supported for running containers after `--`.
 
 Completion supported
 --------------------
