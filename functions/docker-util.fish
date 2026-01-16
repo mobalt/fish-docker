@@ -58,12 +58,17 @@ function __docker_util_nsenter --description 'Enter container namespace with nse
 end
 
 function __docker_util_get_veth --description 'Get veth interface names for containers'
-    if test (count $argv) -lt 1
-        echo "Usage: docker-util get-veth <container> [container...]"
-        return 1
+    set -l containers $argv
+    if test (count $containers) -lt 1
+        # No args: get all running containers sorted by name
+        set containers (docker ps --format '{{.Names}}' 2>/dev/null | sort)
+        if test (count $containers) -lt 1
+            echo "No running containers found" >&2
+            return 1
+        end
     end
 
-    for container in $argv
+    for container in $containers
         # Get container name (in case ID was passed)
         set -l name (docker inspect --format '{{.Name}}' $container 2>/dev/null | string replace -r '^/' '')
         if test -z "$name"
@@ -105,12 +110,17 @@ function __docker_util_get_veth --description 'Get veth interface names for cont
 end
 
 function __docker_util_get_ip --description 'Get IP addresses for containers'
-    if test (count $argv) -lt 1
-        echo "Usage: docker-util get-ip <container> [container...]"
-        return 1
+    set -l containers $argv
+    if test (count $containers) -lt 1
+        # No args: get all running containers sorted by name
+        set containers (docker ps --format '{{.Names}}' 2>/dev/null | sort)
+        if test (count $containers) -lt 1
+            echo "No running containers found" >&2
+            return 1
+        end
     end
 
-    for container in $argv
+    for container in $containers
         # Get container name (in case ID was passed)
         set -l name (docker inspect --format '{{.Name}}' $container 2>/dev/null | string replace -r '^/' '')
         if test -z "$name"

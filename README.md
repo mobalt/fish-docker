@@ -57,7 +57,9 @@ Tab completion is supported for running containers after `--`.
 ### get-veth
 Get the host-side veth interface name for one or more containers. Useful for debugging container networking with tools like `tcpdump`.
 
-    docker-util get-veth <container> [container...]
+    docker-util get-veth [container...]
+
+If no container is specified, returns info for all running containers (sorted by name).
 
 Output format (tab-separated):
 
@@ -73,7 +75,9 @@ Tab completion is supported for running containers.
 ### get-ip
 Get the IP addresses for one or more containers.
 
-    docker-util get-ip <container> [container...]
+    docker-util get-ip [container...]
+
+If no container is specified, returns info for all running containers (sorted by name).
 
 Output format (tab-separated):
 
