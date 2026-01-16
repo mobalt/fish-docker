@@ -1,19 +1,19 @@
-Docker fish completion
-======================
-docker command completion for the fish shell.
-
-- fish = awesome
-- docker = awesome
-- completion = awesome²
+fish-docker
+===========
+Docker utilities and completions for fish shell.
 
 Installation
 ------------
-    mkdir ~/.config/fish/completions
-    wget https://raw.github.com/barnybug/docker-fish-completion/master/docker.fish -O ~/.config/fish/completions/docker.fish
 
-### [Fisherman](https://github.com/fisherman/fisherman)
+### [Fisher](https://github.com/jorgebucaran/fisher)
 
-    fisher install barnybug/docker-fish-completion
+    fisher install mobalt/fish-docker
+
+### Manual
+
+    mkdir -p ~/.config/fish/completions
+    wget https://raw.githubusercontent.com/mobalt/fish-docker/master/completions/docker.fish -O ~/.config/fish/completions/docker.fish
+    wget https://raw.githubusercontent.com/mobalt/fish-docker/master/completions/docker-compose.fish -O ~/.config/fish/completions/docker-compose.fish
 
 fish will show up the new completions straight away, no reload necessary.
     
