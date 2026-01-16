@@ -1,0 +1,7 @@
+[project]
+name = "fish-docker"
+version = "0.1.0"
+description = "Docker utilities and completions for fish shell"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
