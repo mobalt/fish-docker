@@ -7,12 +7,17 @@ end
 
 # Helper: check if no subcommand given yet
 function __fish_docker_util_no_subcommand
-    not __fish_seen_subcommand_from nsenter get-veth
+    not __fish_seen_subcommand_from nsenter get-veth get-ip
 end
 
 # Helper: check if get-veth subcommand is active
 function __fish_docker_util_using_get_veth
     __fish_seen_subcommand_from get-veth
+end
+
+# Helper: check if get-ip subcommand is active
+function __fish_docker_util_using_get_ip
+    __fish_seen_subcommand_from get-ip
 end
 
 # Helper: check if -- has been seen (for nsenter container completion)
@@ -31,9 +36,13 @@ end
 # Subcommand completion
 complete -c docker-util -f -n __fish_docker_util_no_subcommand -a nsenter -d 'Enter container namespace with nsenter'
 complete -c docker-util -f -n __fish_docker_util_no_subcommand -a get-veth -d 'Get veth interface names for containers'
+complete -c docker-util -f -n __fish_docker_util_no_subcommand -a get-ip -d 'Get IP addresses for containers'
 
 # Container completion for nsenter (after --)
 complete -c docker-util -f -n __fish_docker_util_nsenter_needs_container -a '(__fish_docker_util_print_containers)' -d "Container"
 
 # Container completion for get-veth
 complete -c docker-util -f -n __fish_docker_util_using_get_veth -a '(__fish_docker_util_print_containers)' -d "Container"
+
+# Container completion for get-ip
+complete -c docker-util -f -n __fish_docker_util_using_get_ip -a '(__fish_docker_util_print_containers)' -d "Container"

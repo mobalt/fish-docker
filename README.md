@@ -70,6 +70,22 @@ Example:
 
 Tab completion is supported for running containers.
 
+### get-ip
+Get the IP addresses for one or more containers.
+
+    docker-util get-ip <container> [container...]
+
+Output format (tab-separated):
+
+    container_name	network:ip[,network:ip...]
+
+Example:
+
+    $ docker-util get-ip my-nginx
+    my-nginx	bridge:172.17.0.2
+
+Tab completion is supported for running containers.
+
 Completion supported
 --------------------
 - parameters

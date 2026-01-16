@@ -1,7 +1,7 @@
 function docker-util --description 'Docker utilities for fish shell'
     if test (count $argv) -lt 1
         echo "Usage: docker-util <subcommand> [args]"
-        echo "Subcommands: nsenter, get-veth"
+        echo "Subcommands: nsenter, get-veth, get-ip"
         return 1
     end
 
@@ -10,6 +10,8 @@ function docker-util --description 'Docker utilities for fish shell'
             __docker_util_nsenter $argv[2..-1]
         case get-veth
             __docker_util_get_veth $argv[2..-1]
+        case get-ip
+            __docker_util_get_ip $argv[2..-1]
         case '*'
             echo "Unknown subcommand: $argv[1]"
             return 1
@@ -99,5 +101,27 @@ function __docker_util_get_veth --description 'Get veth interface names for cont
 
         # Output: container_name<TAB>networks<TAB>veths
         printf '%s\t%s\t%s\n' $name $networks (string join ',' $veths)
+    end
+end
+
+function __docker_util_get_ip --description 'Get IP addresses for containers'
+    if test (count $argv) -lt 1
+        echo "Usage: docker-util get-ip <container> [container...]"
+        return 1
+    end
+
+    for container in $argv
+        # Get container name (in case ID was passed)
+        set -l name (docker inspect --format '{{.Name}}' $container 2>/dev/null | string replace -r '^/' '')
+        if test -z "$name"
+            echo "Error: Container '$container' not found" >&2
+            continue
+        end
+
+        # Get network names and IPs
+        set -l network_info (docker inspect --format '{{range $k, $v := .NetworkSettings.Networks}}{{$k}}:{{$v.IPAddress}},{{end}}' $container 2>/dev/null | string replace -r ',$' '')
+
+        # Output: container_name<TAB>network:ip,network:ip
+        printf '%s\t%s\n' $name $network_info
     end
 end
