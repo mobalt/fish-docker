@@ -54,7 +54,7 @@ class DockerCmdLine(object):
         if '  ' not in line:
             # ignore continuation lines
             return None
-        opt, description = re.split('  +', line, 1)
+        opt, description = re.split('  +', line, maxsplit=1)
         switches = opt.split(', ')
         metavar = None
         # handle arguments with metavar
@@ -68,13 +68,17 @@ class DockerCmdLine(object):
         return Switch(shorts, longs, description, metavar)
 
     def common_options(self):
-        lines = self.get_output('-h')
-        # skip header
-        while next(lines) != 'Options:':
-            pass
+        lines = self.get_output('--help')
+        # skip header - look for Options: or Global Options:
+        for line in lines:
+            if line in ('Options:', 'Global Options:'):
+                break
+        else:
+            return  # no options section found
 
         for line in lines:
-            if line == 'Commands:':
+            # stop at next section or empty line after options
+            if line and not line.startswith(' ') and not line.startswith('-'):
                 break
             switch = self.parse_switch(line)
             if switch:
@@ -82,13 +86,28 @@ class DockerCmdLine(object):
 
     def subcommands(self):
         lines = self.get_output('help')
-        while next(lines) != 'Commands:':
-            pass
+        in_commands_section = False
 
         for line in lines:
-            if not line:
-                break
-            command, description = line.strip().split(None, 1)
+            # Check for any commands section header
+            if line.endswith('Commands:'):
+                in_commands_section = True
+                continue
+            # Check for non-command sections (like Global Options:)
+            if line and not line.startswith(' ') and line.endswith(':'):
+                in_commands_section = False
+                continue
+            if not in_commands_section:
+                continue
+            if not line.strip():
+                continue
+            parts = line.strip().split(None, 1)
+            if len(parts) < 2:
+                continue
+            command, description = parts
+            # Skip management commands marked with * (plugins)
+            if command.endswith('*'):
+                continue
             yield self.subcommand(command, description)
 
     def subcommand(self, command, description):
@@ -114,7 +133,9 @@ class DockerCmdLine(object):
         for line in lines:
             if not line.strip().startswith('-'):
                 continue
-            switches.append(self.parse_switch(line))
+            switch = self.parse_switch(line)
+            if switch:
+                switches.append(switch)
         return Subcommand(command, description, args, switches)
 
 
