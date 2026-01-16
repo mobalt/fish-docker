@@ -220,7 +220,7 @@ class DockerFishGenerator(BaseFishGenerator):
 
 function __fish_docker_no_subcommand --description 'Test if docker has yet to be given the subcommand'
     for i in (commandline -opc)
-        if contains -- $i %s
+        if contains -- $i compose %s
             return 1
         end
     end
@@ -260,6 +260,210 @@ end
             print('''complete -c docker -A -f -n '__fish_seen_subcommand_from {0}' -a '(__fish_print_docker_images)' -d "Image"'''.format(sub.command))
         elif arg == 'REPOSITORY':
             print('''complete -c docker -A -f -n '__fish_seen_subcommand_from {0}' -a '(__fish_print_docker_repositories)' -d "Repository"'''.format(sub.command))
+
+    def generate(self):
+        super().generate()
+        self.compose_completions()
+
+    def compose_completions(self):
+        """Generate completions for 'docker compose' subcommand."""
+        print('''# compose
+# Helper functions for docker compose completions
+function __fish_docker_compose_no_subcommand --description 'Test if compose has yet to be given a subcommand'
+    set -l cmd (commandline -opc)
+    if not contains compose $cmd
+        return 1
+    end
+    for i in $cmd
+        if contains -- $i attach build commit config cp create down events exec export images kill logs ls pause port ps publish pull push restart rm run scale start stats stop top unpause up version volumes wait watch
+            return 1
+        end
+    end
+    return 0
+end
+
+function __fish_docker_compose_has_subcommand --description 'Test if compose subcommand is given' -a subcmd
+    set -l cmd (commandline -opc)
+    if not contains compose $cmd
+        return 1
+    end
+    if contains -- $subcmd $cmd
+        return 0
+    end
+    return 1
+end
+
+function __fish_print_docker_compose_services --description 'Print a list of docker compose services'
+    docker compose config --services 2>/dev/null | command sort
+end
+
+# compose subcommand
+complete -c docker -f -n '__fish_docker_no_subcommand' -a compose -d 'Define and run multi-container applications'
+
+# compose options (before subcommand)
+complete -c docker -A -n '__fish_docker_compose_no_subcommand' -l all-resources -f -d 'Include all resources'
+complete -c docker -A -n '__fish_docker_compose_no_subcommand' -l ansi -f -d 'Control ANSI output (never|always|auto)'
+complete -c docker -A -n '__fish_docker_compose_no_subcommand' -l compatibility -f -d 'Run in backward compatibility mode'
+complete -c docker -A -n '__fish_docker_compose_no_subcommand' -l dry-run -f -d 'Execute in dry run mode'
+complete -c docker -A -n '__fish_docker_compose_no_subcommand' -l env-file -f -d 'Alternate environment file'
+complete -c docker -A -n '__fish_docker_compose_no_subcommand' -s f -l file -f -d 'Compose configuration files'
+complete -c docker -A -n '__fish_docker_compose_no_subcommand' -l parallel -f -d 'Control max parallelism'
+complete -c docker -A -n '__fish_docker_compose_no_subcommand' -l profile -f -d 'Specify a profile to enable'
+complete -c docker -A -n '__fish_docker_compose_no_subcommand' -l progress -f -d 'Progress output type (auto|tty|plain|json|quiet)'
+complete -c docker -A -n '__fish_docker_compose_no_subcommand' -l project-directory -f -d 'Alternate working directory'
+complete -c docker -A -n '__fish_docker_compose_no_subcommand' -s p -l project-name -f -d 'Project name'
+
+# compose subcommands
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a attach -d 'Attach to a running container'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a build -d 'Build or rebuild services'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a commit -d 'Create image from container changes'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a config -d 'Parse and render compose file'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a cp -d 'Copy files between container and host'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a create -d 'Create containers for a service'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a down -d 'Stop and remove containers, networks'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a events -d 'Receive real time events'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a exec -d 'Execute command in running container'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a export -d 'Export container filesystem as tar'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a images -d 'List images used by containers'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a kill -d 'Force stop service containers'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a logs -d 'View output from containers'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a ls -d 'List running compose projects'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a pause -d 'Pause services'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a port -d 'Print public port for a port binding'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a ps -d 'List containers'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a pull -d 'Pull service images'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a push -d 'Push service images'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a restart -d 'Restart service containers'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a rm -d 'Remove stopped service containers'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a run -d 'Run a one-off command'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a scale -d 'Scale services'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a start -d 'Start services'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a stats -d 'Display container resource usage'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a stop -d 'Stop services'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a top -d 'Display running processes'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a unpause -d 'Unpause services'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a up -d 'Create and start containers'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a version -d 'Show Docker Compose version'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a wait -d 'Block until containers stop'
+complete -c docker -f -n '__fish_docker_compose_no_subcommand' -a watch -d 'Watch build context and rebuild'
+
+# compose up options
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l abort-on-container-exit -f -d 'Stop all containers if any stop'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l always-recreate-deps -f -d 'Recreate dependent containers'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l attach -f -d 'Restrict attaching to specific services'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l build -f -d 'Build images before starting'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -s d -l detach -f -d 'Run containers in background'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l exit-code-from -f -d 'Return exit code from service'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l force-recreate -f -d 'Recreate containers even if unchanged'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l no-build -f -d 'Do not build images'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l no-deps -f -d 'Do not start linked services'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l no-recreate -f -d 'Do not recreate existing containers'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l no-start -f -d 'Do not start services after creating'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l pull -f -d 'Pull image policy (always|missing|never)'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l quiet-pull -f -d 'Pull without printing progress'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l remove-orphans -f -d 'Remove containers not in compose file'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l scale -f -d 'Scale service to NUM instances'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -s t -l timeout -f -d 'Shutdown timeout in seconds'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l wait -f -d 'Wait for services to be healthy'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand up' -l watch -f -d 'Watch source and rebuild/refresh'
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand up' -a '(__fish_print_docker_compose_services)' -d "Service"
+
+# compose down options
+complete -c docker -A -n '__fish_docker_compose_has_subcommand down' -l remove-orphans -f -d 'Remove containers not in compose file'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand down' -l rmi -f -d 'Remove images (all|local)'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand down' -s t -l timeout -f -d 'Shutdown timeout in seconds'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand down' -s v -l volumes -f -d 'Remove named volumes'
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand down' -a '(__fish_print_docker_compose_services)' -d "Service"
+
+# compose logs options
+complete -c docker -A -n '__fish_docker_compose_has_subcommand logs' -s f -l follow -f -d 'Follow log output'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand logs' -l no-color -f -d 'Produce monochrome output'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand logs' -l no-log-prefix -f -d 'Do not print prefix in logs'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand logs' -l since -f -d 'Show logs since timestamp'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand logs' -s n -l tail -f -d 'Number of lines from end of logs'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand logs' -s t -l timestamps -f -d 'Show timestamps'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand logs' -l until -f -d 'Show logs before timestamp'
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand logs' -a '(__fish_print_docker_compose_services)' -d "Service"
+
+# compose exec options
+complete -c docker -A -n '__fish_docker_compose_has_subcommand exec' -s d -l detach -f -d 'Run in background'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand exec' -s e -l env -f -d 'Set environment variables'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand exec' -l index -f -d 'Index of container if scaled'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand exec' -s T -l no-TTY -f -d 'Disable pseudo-TTY allocation'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand exec' -l privileged -f -d 'Give extended privileges'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand exec' -s u -l user -f -d 'Run as this user'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand exec' -s w -l workdir -f -d 'Working directory inside container'
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand exec' -a '(__fish_print_docker_compose_services)' -d "Service"
+
+# compose run options
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -l build -f -d 'Build image before running'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -l cap-add -f -d 'Add Linux capabilities'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -l cap-drop -f -d 'Drop Linux capabilities'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -s d -l detach -f -d 'Run in background'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -l entrypoint -f -d 'Override entrypoint'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -s e -l env -f -d 'Set environment variables'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -s i -l interactive -f -d 'Keep STDIN open'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -s l -l label -f -d 'Add or override label'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -l name -f -d 'Assign a name to the container'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -s T -l no-TTY -f -d 'Disable pseudo-TTY allocation'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -l no-deps -f -d 'Do not start linked services'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -s p -l publish -f -d 'Publish container port'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -l quiet-pull -f -d 'Pull without printing progress'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -l rm -f -d 'Remove container when it exits'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -l service-ports -f -d 'Run with service port mappings'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -l use-aliases -f -d 'Use service network aliases'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -s u -l user -f -d 'Run as this user'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -s v -l volume -f -d 'Bind mount a volume'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand run' -s w -l workdir -f -d 'Working directory inside container'
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand run' -a '(__fish_print_docker_compose_services)' -d "Service"
+
+# compose ps options
+complete -c docker -A -n '__fish_docker_compose_has_subcommand ps' -s a -l all -f -d 'Show all containers'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand ps' -l filter -f -d 'Filter output'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand ps' -l format -f -d 'Format output (table|json)'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand ps' -l no-trunc -f -d 'Do not truncate output'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand ps' -l orphans -f -d 'Include orphaned containers'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand ps' -s q -l quiet -f -d 'Only display container IDs'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand ps' -l services -f -d 'Display services'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand ps' -l status -f -d 'Filter by status'
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand ps' -a '(__fish_print_docker_compose_services)' -d "Service"
+
+# compose build options
+complete -c docker -A -n '__fish_docker_compose_has_subcommand build' -l build-arg -f -d 'Set build-time variables'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand build' -l builder -f -d 'Set builder to use'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand build' -l memory -f -d 'Set memory limit for build'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand build' -l no-cache -f -d 'Do not use cache'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand build' -l pull -f -d 'Always pull newer image'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand build' -l push -f -d 'Push images after build'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand build' -s q -l quiet -f -d 'Do not print anything'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand build' -l ssh -f -d 'Set SSH agent socket or keys'
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand build' -a '(__fish_print_docker_compose_services)' -d "Service"
+
+# compose pull/push options
+complete -c docker -A -n '__fish_docker_compose_has_subcommand pull' -l ignore-buildable -f -d 'Ignore images that can be built'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand pull' -l ignore-pull-failures -f -d 'Pull what it can and ignore failures'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand pull' -l include-deps -f -d 'Also pull service dependencies'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand pull' -l policy -f -d 'Apply pull policy (missing|always)'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand pull' -s q -l quiet -f -d 'Pull without printing progress'
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand pull' -a '(__fish_print_docker_compose_services)' -d "Service"
+complete -c docker -A -n '__fish_docker_compose_has_subcommand push' -l ignore-push-failures -f -d 'Push what it can and ignore failures'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand push' -l include-deps -f -d 'Also push service dependencies'
+complete -c docker -A -n '__fish_docker_compose_has_subcommand push' -s q -l quiet -f -d 'Push without printing progress'
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand push' -a '(__fish_print_docker_compose_services)' -d "Service"
+
+# Service completions for other compose subcommands
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand start' -a '(__fish_print_docker_compose_services)' -d "Service"
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand stop' -a '(__fish_print_docker_compose_services)' -d "Service"
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand restart' -a '(__fish_print_docker_compose_services)' -d "Service"
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand pause' -a '(__fish_print_docker_compose_services)' -d "Service"
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand unpause' -a '(__fish_print_docker_compose_services)' -d "Service"
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand kill' -a '(__fish_print_docker_compose_services)' -d "Service"
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand rm' -a '(__fish_print_docker_compose_services)' -d "Service"
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand create' -a '(__fish_print_docker_compose_services)' -d "Service"
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand attach' -a '(__fish_print_docker_compose_services)' -d "Service"
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand top' -a '(__fish_print_docker_compose_services)' -d "Service"
+complete -c docker -A -f -n '__fish_docker_compose_has_subcommand events' -a '(__fish_print_docker_compose_services)' -d "Service"
+''')
 
 
 class DockerComposeFishGenerator(BaseFishGenerator):
