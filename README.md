@@ -54,6 +54,22 @@ Examples:
 
 Tab completion is supported for running containers after `--`.
 
+### get-veth
+Get the host-side veth interface name for one or more containers. Useful for debugging container networking with tools like `tcpdump`.
+
+    docker-util get-veth <container> [container...]
+
+Output format (tab-separated):
+
+    container_name	docker_network	veth_name
+
+Example:
+
+    $ docker-util get-veth my-nginx
+    my-nginx	bridge	veth006358f
+
+Tab completion is supported for running containers.
+
 Completion supported
 --------------------
 - parameters
